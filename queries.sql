@@ -38,3 +38,17 @@ HAVING
     AVG(quantity * price) < (SELECT avg_income FROM overall_avg)
 ORDER BY 
     average_income ASC;
+
+
+select 
+concat(first_name, ' ', last_name) as seller ,
+TRIM (TO_CHAR(sale_date, 'Day')) day_of_week,
+ROUND (SUM (quantity * price), 0) as income
+from sales s 
+left join products p 
+on s.product_id = p.product_id
+left join employees e 
+on s.sales_person_id= e.employee_id
+group by first_name, last_name , 
+TRIM(TO_CHAR(s.sale_date, 'Day')), EXTRACT(ISODOW FROM s.sale_date)
+order by EXTRACT(ISODOW FROM s.sale_date), seller
