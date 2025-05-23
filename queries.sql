@@ -52,3 +52,15 @@ on s.sales_person_id= e.employee_id
 group by first_name, last_name , 
 TRIM(TO_CHAR(s.sale_date, 'Day')), EXTRACT(ISODOW FROM s.sale_date)
 order by EXTRACT(ISODOW FROM s.sale_date), seller
+
+select
+CASE
+	WHEN age BETWEEN 16 AND 25 THEN '16-25'
+	WHEN age BETWEEN 26 AND 40 THEN '26-40'
+	WHEN age > 40 THEN '40+'
+	end  as age_category ,
+	COUNT(age) as age_count
+from customers c
+group by age_category
+ORDER by age_category 
+
