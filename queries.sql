@@ -64,3 +64,13 @@ from customers c
 group by age_category
 ORDER by age_category 
 
+
+select
+to_char (sale_date, 'YYYY-MM') as selling_month,
+COUNT(DISTINCT customer_id) as total_customers,
+ROUND(SUM (quantity * p.price), 0) as income
+from sales s
+left join products p
+on s.product_id = p.product_id
+group by selling_month
+
