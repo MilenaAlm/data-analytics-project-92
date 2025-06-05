@@ -122,6 +122,7 @@ WITH first_zero_price_purchase AS (
         s.customer_id, 
         s.sale_date
 )
+
 SELECT
     f.first_date AS sale_date,
     CONCAT(c.first_name, ' ', c.last_name) AS customer,
