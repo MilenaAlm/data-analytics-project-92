@@ -1,14 +1,13 @@
 -- запрос, который считает общее количество покупателей из таблицы customers
 select 
-COUNT (customer_id)   as customers_count
+COUNT (customer_id)  as customers_count
 from customers
 
 /*Отчет о десятке лучших продавцов (продавцs,  суммарная выручка и количество проведенных сделок),
 отсортированы по убыванию выручки*/
-select 
 concat(first_name, ' ', last_name) as seller ,
 COUNT (sales_id) as operations,
-ROUND (SUM (quantity * price), 0) as income
+FLOOR(SUM(quantity * price)) as income
 from sales s 
 left join products p 
 on s.product_id = p.product_id
@@ -39,7 +38,7 @@ ORDER BY average_income ASC;
 SELECT 
     concat(first_name, ' ', last_name) as seller,
     TO_CHAR(sale_date, 'day') as day_of_week,
-    ROUND(SUM(quantity * price), 0) as income
+    FLOOR(SUM(quantity * price)) as income
 FROM sales s 
 LEFT JOIN products p ON s.product_id = p.product_id
 LEFT JOIN employees e ON s.sales_person_id = e.employee_id
@@ -70,7 +69,7 @@ ORDER by age_category;
 select
 to_char (sale_date, 'YYYY-MM') as selling_month,
 COUNT(DISTINCT customer_id) as total_customers,
-ROUND(SUM (quantity * p.price), 0) as income
+FLOOR(SUM (quantity * p.price)) as income
 from sales s
 left join products p
 on s.product_id = p.product_id
@@ -78,21 +77,21 @@ group by selling_month;
 
 /*Покупатели, первая покупка которых была в ходе проведения акций (акционные товары отпускали со стоимостью равной 0). 
 Отсортирована по id покупателя*/
-WITH first_zero_price_date AS (
-    SELECT 
+WITH first_zero_price_purchase AS (
+    SELECT DISTINCT ON (s.customer_id)
         s.customer_id,
-        MIN(s.sale_date) AS first_date,
-        MIN(s.sales_person_id) AS sales_person_id
+        s.sale_date AS first_date,
+        s.sales_person_id
     FROM sales s
     JOIN products p ON s.product_id = p.product_id
     WHERE p.price = 0
-    GROUP BY s.customer_id
+    ORDER BY s.customer_id, s.sale_date
 )
 SELECT 
     CONCAT(c.first_name, ' ', c.last_name) AS customer,
-    f.first_date,
+    f.first_date AS sale_date,
     CONCAT(e.first_name, ' ', e.last_name) AS seller
-FROM first_zero_price_date f
+FROM first_zero_price_purchase f
 JOIN customers c ON f.customer_id = c.customer_id
 JOIN employees e ON f.sales_person_id = e.employee_id
 ORDER BY c.customer_id;
